@@ -9,7 +9,7 @@ class Branch extends Model
 {
     protected $table = 'branches';
     protected $primaryKey = 'id';
-    protected $fillable = ['name', 'address', 'photo'];
+    protected $fillable = ['name', 'address', 'photo', 'status'];
     public $timestamps = true;
     public $incrementing = true;
 

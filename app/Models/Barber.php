@@ -13,7 +13,7 @@ class Barber extends Model
     public $incrementing = true;
     public $timestamps = true;
 
-    protected $fillable = ['name', 'branch_id', 'photo'];
+    protected $fillable = ['name', 'branch_id', 'photo', 'status'];
 
     public function branch(): BelongsTo
     {

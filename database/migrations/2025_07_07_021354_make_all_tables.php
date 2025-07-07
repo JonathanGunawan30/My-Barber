@@ -16,7 +16,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('barbers', function (Blueprint $table) {
+        Schema::create('barber', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->foreignId('branch_id')->constrained();
@@ -83,7 +83,7 @@ return new class extends Migration
         Schema::dropIfExists('bookings');
         Schema::dropIfExists('customers');
         Schema::dropIfExists('services');
-        Schema::dropIfExists('barbers');
+        Schema::dropIfExists('barber');
         Schema::dropIfExists('branches');
     }
 };
