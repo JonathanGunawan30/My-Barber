@@ -10,7 +10,6 @@ use App\Models\Barber;
 use App\Models\Branch;
 use App\Services\Interfaces\BarberService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -89,9 +88,16 @@ class BarberController extends Controller
      */
     public function destroy(string $id): RedirectResponse
     {
-        $this->barberService->delete($id);
-        return redirect()->route('admin.barbers.index')->with('success', 'Barber deleted successfully.');
+        $deleted = $this->barberService->delete($id);
+
+        if (!$deleted) {
+            return redirect()->back()->with('error', 'This barber cannot be deleted because it is still linked to bookings or testimonials.');
+        }
+
+        return redirect()->route('admin.barbers.index')
+            ->with('success', 'Barber deleted successfully.');
     }
+
 
     public function updateStatus(UpdateBarberStatusRequest $request, Barber $barber)
     {

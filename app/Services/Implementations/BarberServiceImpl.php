@@ -43,14 +43,21 @@ class BarberServiceImpl implements BarberService
         return $barber;
     }
 
-    public function delete($id)
+    public function delete($id): bool
     {
         $barber = Barber::findOrFail($id);
+
+        if ($barber->bookings()->exists() || $barber->testimonials()->exists()) {
+            return false;
+        }
+
         if ($barber->photo) {
             Storage::disk('public')->delete($barber->photo);
         }
-        $barber->delete();
+
+        return $barber->delete();
     }
+
 
     public function updateStatus(Barber $barber, $status): void
     {

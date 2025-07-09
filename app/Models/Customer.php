@@ -26,6 +26,6 @@ class Customer extends Model
 
     public function testimonials(): HasMany
     {
-        return $this->hasMany(Testimonial::class, 'customer_id', 'id');;
+        return $this->hasMany(Testimonial::class, 'customer_id', 'id');
     }
 }

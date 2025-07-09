@@ -3,6 +3,13 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="application-name" content="{{ config('app.name', 'Laravel') }}">
+        <meta name="description" content="{{ config('app.name', 'Laravel') }}">
+        <meta name="author" content="{{ config('app.name', 'Laravel') }}">
+        <meta name="copyright" content="{{ config('app.name', 'Laravel') }}">
+        <meta name="keywords" content="{{ config('app.name', 'Laravel') }}">
+        <meta name="language" content="English">
 
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>

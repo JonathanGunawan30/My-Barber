@@ -112,6 +112,17 @@
                                 <UserCog class="mr-3 w-5 h-5" />
                                 Barbers
                             </Link>
+                            <Link
+                                href="/admin/hairstyles"
+                                :class="[
+                                  'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200',
+                                  page.url.includes('/admin/hairstyles')
+                                    ? 'bg-blue-100 dark:bg-blue-700 text-blue-800 dark:text-blue-200 shadow-sm'
+                                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                ]"
+                            >
+                                <Palette class="mr-3 w-5 h-5" /> Hairstyles
+                            </Link>
                         </div>
                     </div>
 
@@ -246,8 +257,8 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { usePage, Link } from '@inertiajs/vue3'
 import {
-    LayoutDashboard, Users, User, Scissors, Home, UserCog, MessageSquare, CalendarDays,
-    Moon, Sun, BellRing, ChevronDown, Menu, X, Book, Heart, Github
+    LayoutDashboard, Users, User, Scissors, Home, UserCog, MessageSquare, CalendarDays, Palette,
+    Moon, Sun, BellRing, ChevronDown, Menu, X, Book, Github
 } from 'lucide-vue-next'
 
 const page = usePage()
@@ -265,6 +276,7 @@ const pageTitle = computed(() => {
     if (path.includes('/admin/customers')) return 'Customers'
     if (path.includes('/admin/services')) return 'Services'
     if (path.includes('/admin/barber')) return 'Barbers'
+    if (path.includes('/admin/hairstyles')) return 'Hairstyles'
     if (path.includes('/admin/testimonials')) return 'Testimonials'
     if (path.includes('/admin/bookings')) return 'Bookings'
     return 'Dashboard'

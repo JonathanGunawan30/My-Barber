@@ -21,6 +21,16 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('barbers', \App\Http\Controllers\Admin\BarberController::class);
     Route::patch('/barbers/{barber}/status', [\App\Http\Controllers\Admin\BarberController::class, 'updateStatus']);
 
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+    Route::patch('/users/{user}/status', [\App\Http\Controllers\Admin\UserController::class, 'updateStatus']);
+
+    Route::resource('customers', \App\Http\Controllers\Admin\CustomerController::class);
+
+    Route::resource('testimonials', \App\Http\Controllers\Admin\TestimonialController::class);
+
+    Route::resource('hairstyles', \App\Http\Controllers\Admin\HairstyleController::class);
+    Route::patch('/hairstyles/{hairstyle}/toggle-featured', [\App\Http\Controllers\Admin\HairstyleController::class, 'updateStatus']);
+
 });
 
 require __DIR__.'/settings.php';

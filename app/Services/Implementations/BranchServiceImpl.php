@@ -28,12 +28,19 @@ class BranchServiceImpl implements BranchService
 
         return $branch;
     }
-
     function delete($id)
     {
-        $branch = Branch::findOrFail($id);
-        return $branch->delete();
+        $branch = Branch::withCount(['barbers', 'bookings'])->findOrFail($id);
+
+        if ($branch->barbers_count > 0 || $branch->bookings_count > 0) {
+            return false;
+        }
+
+        $deleted = $branch->delete();
+
+        return $deleted;
     }
+
 
     function getAll()
     {

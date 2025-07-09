@@ -90,13 +90,25 @@ class BranchController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+
     public function destroy($id): RedirectResponse
     {
-        $this->branchService->delete($id);
+        $deleted = $this->branchService->delete($id);
 
-        return redirect()->route('admin.branches.index')
-            ->with('success', 'Branch deleted successfully.');
+        if (!$deleted) {
+            return redirect()->back()->with('error', 'Cannot delete this branch because it is still associated with other records.');
+        }
+
+        try {
+            return redirect()->route('admin.branches.index')
+                ->with('success', 'Branch deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.branches.index')
+                ->with('error', 'Branch cannot be deleted.');
+        }
+
     }
+
 
     public function updateStatus(UpdateStatusRequest $request, Branch $branch)
     {

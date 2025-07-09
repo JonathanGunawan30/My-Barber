@@ -19,11 +19,11 @@ class Testimonial extends Model
 
     public function customer(): BelongsTo
     {
-        return $this->belongsTo(Customer::class, 'customer_id', 'id');;
+        return $this->belongsTo(Customer::class, 'customer_id', 'id');
     }
 
     public function barber()
     {
-        return $this->belongsTo(Barber::class, 'barber_id', 'id');;
+        return $this->belongsTo(Barber::class, 'barber_id', 'id');
     }
 }
