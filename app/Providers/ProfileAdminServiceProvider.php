@@ -2,22 +2,20 @@
 
 namespace App\Providers;
 
-use App\Services\Implementations\UserServiceImpl;
-use App\Services\Interfaces\UserService;
-use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
+use App\Services\Implementations\ProfileAdminServiceImpl;
+use App\Services\Interfaces\ProfileAdminService;
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
-class UserServiceProvider extends ServiceProvider implements DeferrableProvider
+class ProfileAdminServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     public array $singletons = [
-        UserService::class => UserServiceImpl::class,
+        ProfileAdminService::class => ProfileAdminServiceImpl::class,
     ];
 
     public function provides(): array
     {
-        return [UserService::class];
+        return [ProfileAdminService::class];
     }
     /**
      * Register services.

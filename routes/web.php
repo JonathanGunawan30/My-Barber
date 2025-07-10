@@ -31,6 +31,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('hairstyles', \App\Http\Controllers\Admin\HairstyleController::class);
     Route::patch('/hairstyles/{hairstyle}/toggle-featured', [\App\Http\Controllers\Admin\HairstyleController::class, 'updateStatus']);
 
+    Route::get('/profile', [\App\Http\Controllers\Admin\ProfileAdminController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [\App\Http\Controllers\Admin\ProfileAdminController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [\App\Http\Controllers\Admin\ProfileAdminController::class, 'updatePassword'])->name('profile.password');
+
+    Route::get("/dashboard", [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+
 });
 
 require __DIR__.'/settings.php';

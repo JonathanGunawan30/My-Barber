@@ -7,6 +7,7 @@ return [
     App\Providers\BranchServiceProvider::class,
     App\Providers\CustomerServiceProvider::class,
     App\Providers\HairstyleServiceProvider::class,
+    App\Providers\ProfileAdminServiceProvider::class,
     App\Providers\ServiceServiceProvider::class,
     App\Providers\TestimonialServiceProvider::class,
     App\Providers\UserServiceProvider::class,

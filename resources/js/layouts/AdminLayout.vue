@@ -10,8 +10,8 @@
         >
             <div class="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700">
                 <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                        <Book class="w-5 h-5 text-white" />
+                    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                        <Scissors class="w-5 h-5 text-white" />
                     </div>
                     <span class="text-xl font-bold text-gray-900 dark:text-white">My Barber</span>
                 </div>
@@ -67,7 +67,7 @@
                                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                                 ]"
                             >
-                                <User class="mr-3 w-5 h-5" />
+                                <UserIcon class="mr-3 w-5 h-5" />
                                 Customers
                             </Link>
                         </div>
@@ -181,19 +181,20 @@
                             <Sun v-else class="w-5 h-5" />
                         </button>
 
-                        <button class="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 relative">
-                            <BellRing class="w-5 h-5" />
-                            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                        </button>
-
                         <div class="relative">
                             <button
                                 @click="showProfileDropdown = !showProfileDropdown"
                                 class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                             >
-                                <img class="w-8 h-8 rounded-full" src="/placeholder.svg?height=32&width=32" alt="Profile">
-                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Admin User</span>
-                                <ChevronDown class="w-4 h-4 text-gray-400" />
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                                    <span v-if="page.props.auth.user.name">{{ getInitials(page.props.auth.user.name) }}</span>
+                                    <UserIcon v-else class="w-5 h-5" /> </div>
+
+                                <div class="flex flex-col items-start leading-tight">
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ page.props.auth.user.name }}</span>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ page.props.auth.user.email }}</p>
+                                </div>
+                                <ChevronDown class="w-4 h-4 text-gray-400 flex-shrink-0" />
                             </button>
 
                             <div
@@ -202,11 +203,22 @@
                                 class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50"
                             >
                                 <div class="py-1">
-                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
-                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
+                                    <Link :href="route('admin.profile.edit')" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <Settings class="w-4 h-4" /> Settings
+                                    </Link>
+
                                     <hr class="border-gray-200 dark:border-gray-700">
-                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Sign out</a>
+
+                                    <Link
+                                        :href="route('logout')"
+                                        method="post"
+                                        as="button"
+                                        class="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    >
+                                        <LogOut class="w-4 h-4" /> Sign out
+                                    </Link>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -257,8 +269,8 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { usePage, Link } from '@inertiajs/vue3'
 import {
-    LayoutDashboard, Users, User, Scissors, Home, UserCog, MessageSquare, CalendarDays, Palette,
-    Moon, Sun, BellRing, ChevronDown, Menu, X, Book, Github
+    LayoutDashboard, Users, User as UserIcon, Scissors, Home, UserCog, MessageSquare, CalendarDays, Palette,
+    Moon, Sun, ChevronDown, Menu, X, Github, Settings, LogOut
 } from 'lucide-vue-next'
 
 const page = usePage()
@@ -267,6 +279,14 @@ const showProfileDropdown = ref(false)
 const isDarkMode = ref(false)
 
 const currentYear = computed(() => new Date().getFullYear());
+
+const getInitials = (name) => {
+    if (!name) return '';
+    const nameParts = name.split(' ').filter(part => part.length > 0);
+    if (nameParts.length === 0) return '';
+    if (nameParts.length === 1) return nameParts[0].charAt(0).toUpperCase();
+    return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
+};
 
 const pageTitle = computed(() => {
     const path = page.url
@@ -279,6 +299,9 @@ const pageTitle = computed(() => {
     if (path.includes('/admin/hairstyles')) return 'Hairstyles'
     if (path.includes('/admin/testimonials')) return 'Testimonials'
     if (path.includes('/admin/bookings')) return 'Bookings'
+
+    if (path.includes('/admin/profile')) return 'Account Settings'
+
     return 'Dashboard'
 })
 
@@ -298,20 +321,26 @@ const toggleDarkMode = () => {
 }
 
 const handleClickOutside = (event) => {
-    const profileDropdownButton = document.querySelector('.relative > button');
-    if (showProfileDropdown.value && !event.target.closest('.relative') && !profileDropdownButton.contains(event.target)) {
+    const dropdownContainer = document.querySelector('.relative > button').closest('.relative');
+    if (showProfileDropdown.value && dropdownContainer && !dropdownContainer.contains(event.target)) {
         showProfileDropdown.value = false;
     }
 }
 
 onMounted(() => {
     const savedDarkMode = localStorage.getItem('darkMode')
+
     if (savedDarkMode === 'true') {
         isDarkMode.value = true
         document.documentElement.classList.add('dark')
+    } else {
+        isDarkMode.value = false
+        document.documentElement.classList.remove('dark')
     }
+
     document.addEventListener('click', handleClickOutside)
 })
+
 
 onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside)
