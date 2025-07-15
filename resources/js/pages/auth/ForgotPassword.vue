@@ -59,7 +59,7 @@
                     <div class="text-center">
                         <TextLink
                             :href="route('login')"
-                            class="inline-flex items-center gap-2 font-medium text-blue-600 transition-colors duration-200 hover:text-blue-500"
+                            class="inline-flex items-center gap-2 font-medium text-black hover:text-blue-600 dark:text-black dark:hover:text-blue-600 !no-underline transition-all duration-200"
                         >
                             <ArrowLeft class="h-4 w-4" />
                             Return to login

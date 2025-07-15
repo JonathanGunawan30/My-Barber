@@ -56,7 +56,7 @@
                             <TextLink
                                 v-if="canResetPassword"
                                 :href="route('password.request')"
-                                class="text-sm text-blue-600 transition-colors duration-200 hover:text-blue-500"
+                                class="inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-700 dark:hover:text-blue-600 !no-underline transition-all duration-200"
                                 :tabindex="5"
                             >
                                 Forgot password?
@@ -132,7 +132,7 @@
                     <TextLink
                         :href="route('register')"
                         :tabindex="5"
-                        class="inline-flex items-center gap-2 font-medium text-blue-600 transition-colors duration-200 hover:text-blue-500"
+                        class="inline-flex items-center gap-2 font-medium text-black hover:text-blue-600 dark:text-black dark:hover:text-blue-600 !no-underline transition-all duration-200"
                     >
                         <UserPlus class="h-4 w-4" />
                         Create an account
@@ -141,8 +141,8 @@
             </div>
 
             <!-- Footer -->
-            <footer class="shadow-t z-30 border-t border-gray-200 dark:border-gray-700">
-                <div class="mx-auto flex h-12 max-w-7xl items-center justify-center px-4 sm:px-6 lg:px-8">
+            <footer class="z-30">
+            <div class="mx-auto flex h-12 max-w-7xl items-center justify-center px-4 sm:px-6 lg:px-8">
                     <p class="flex items-center text-xs text-gray-600 dark:text-gray-400">
                         &copy; {{ currentYear }} My Barber App. Developed by
                         <a
