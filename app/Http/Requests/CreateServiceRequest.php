@@ -25,6 +25,7 @@ class CreateServiceRequest extends FormRequest
             'name' => 'required|string|max:255|unique:services,name',
             'price' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:1',
+            'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ];
     }
 

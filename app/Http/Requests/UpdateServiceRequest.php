@@ -26,6 +26,7 @@ class UpdateServiceRequest extends FormRequest
             'name' => ['sometimes', 'string', 'max:255', Rule::unique('services', 'name')->ignore($this->route('service')),],
             'price' => 'sometimes|numeric|min:0',
             'duration' => 'sometimes|integer|min:1',
+            'photo' => 'sometimes|image|mimes:jpeg,png,jpg|max:2048',
         ];
     }
 

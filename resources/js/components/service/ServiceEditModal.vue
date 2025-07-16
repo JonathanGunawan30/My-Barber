@@ -106,6 +106,101 @@
                                 <p v-if="errors.duration" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ errors.duration }}</p>
                             </div>
 
+                            <div>
+                                <label for="edit-photo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Service Photo (Optional)
+                                </label>
+                                <div class="space-y-4">
+                                    <div
+                                        @drop="handleDrop"
+                                        @dragover.prevent
+                                        @dragenter.prevent="isDragging = true"
+                                        @dragleave="isDragging = false"
+                                        class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors duration-200"
+                                        :class="{ 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20': isDragging }"
+                                    >
+                                        <input
+                                            id="edit-photo"
+                                            ref="fileInput"
+                                            type="file"
+                                            accept="image/*"
+                                            class="hidden"
+                                            @change="handleFileSelect"
+                                        />
+
+                                        <div v-if="photoPreview" class="space-y-3">
+                                            <div class="relative inline-block">
+                                                <img
+                                                    :src="photoPreview"
+                                                    alt="New service preview"
+                                                    class="w-32 h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    @click="clearNewPhoto"
+                                                    class="absolute -top-2 -right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg transition-colors duration-200"
+                                                    title="Remove selected photo"
+                                                >
+                                                    <X class="w-4 h-4" />
+                                                </button>
+                                                <div class="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                                                    New
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ form.photo?.name }}</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                    {{ formatFileSize(form.photo?.size) }}
+                                                </p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                @click="$refs.fileInput.click()"
+                                                class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
+                                            >
+                                                Change Photo
+                                            </button>
+                                        </div>
+
+                                        <div v-else-if="service?.photo" class="space-y-3">
+                                            <div class="relative inline-block">
+                                                <img
+                                                    :src="`/storage/${service.photo}`"
+                                                    :alt="service.name"
+                                                    class="w-32 h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+                                                />
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">Current Photo</p>
+                                                <button
+                                                    type="button"
+                                                    @click="$refs.fileInput.click()"
+                                                    class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium mt-1"
+                                                >
+                                                    Change Photo
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div v-else class="space-y-2">
+                                            <Upload class="w-8 h-8 text-gray-400 mx-auto" />
+                                            <div>
+                                                <button
+                                                    type="button"
+                                                    @click="$refs.fileInput.click()"
+                                                    class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                                                >
+                                                    Click to upload
+                                                </button>
+                                                <span class="text-gray-500 dark:text-gray-400"> or drag and drop</span>
+                                            </div>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, JPEG up to 2MB</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p v-if="errors.photo" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ errors.photo }}</p>
+                            </div>
+
                             <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                                 <button
                                     type="button"
@@ -132,10 +227,10 @@
     </Transition>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue'
 import { router } from '@inertiajs/vue3'
-import { Scissors, Tag, Clock, X, Loader2, Pencil, Save } from 'lucide-vue-next'
+import { Scissors, Tag, Clock, X, Loader2, Pencil, Save, Upload } from 'lucide-vue-next'
 import Swal from 'sweetalert2'
 
 const props = defineProps({
@@ -154,20 +249,31 @@ const emit = defineEmits(['close', 'updated'])
 const form = ref({
     name: '',
     price: null,
-    duration: null
+    duration: null,
+    photo: null,
+    _method: 'patch',
 })
 
 const errors = ref({})
 const isSubmitting = ref(false)
+const isDragging = ref(false)
+const photoPreview = ref(null)
+const fileInput = ref(null)
 
 watch(() => props.service, (newService) => {
     if (newService) {
         form.value = {
             name: newService.name || '',
             price: newService.price || null,
-            duration: newService.duration || null
+            duration: newService.duration || null,
+            photo: null,
+            _method: 'patch',
         }
-        errors.value = {}
+        photoPreview.value = null;
+        errors.value = {};
+        if (fileInput.value) {
+            fileInput.value.value = '';
+        }
     }
 }, { immediate: true })
 
@@ -178,6 +284,73 @@ watch(() => props.isOpen, (newValue) => {
         document.body.style.overflow = 'auto'
     }
 })
+
+const handleFileSelect = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        validateAndSetFile(file)
+    }
+}
+
+const handleDrop = (event) => {
+    event.preventDefault()
+    isDragging.value = false
+
+    const files = event.dataTransfer.files
+    if (files.length > 0) {
+        validateAndSetFile(files[0])
+    }
+}
+
+const validateAndSetFile = (file) => {
+    if (!file.type.startsWith('image/')) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid File Type',
+            text: 'Please select an image file (PNG, JPG, JPEG)',
+            confirmButtonColor: '#3B82F6'
+        })
+        return
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+        Swal.fire({
+            icon: 'error',
+            title: 'File Too Large',
+            text: 'Please select an image smaller than 2MB',
+            confirmButtonColor: '#3B82F6'
+        })
+        return
+    }
+
+    form.value.photo = file;
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+        photoPreview.value = e.target.result
+    }
+    reader.readAsDataURL(file)
+
+    if (errors.value.photo) {
+        delete errors.value.photo
+    }
+}
+
+const clearNewPhoto = () => {
+    form.value.photo = null;
+    photoPreview.value = null;
+    if (fileInput.value) {
+        fileInput.value.value = '';
+    }
+}
+
+const formatFileSize = (bytes) => {
+    if (!bytes) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
 
 const submitForm = async () => {
     if (isSubmitting.value || !props.service) return
@@ -202,7 +375,18 @@ const submitForm = async () => {
     isSubmitting.value = true
 
     try {
-        router.patch(`/admin/services/${props.service.id}`, form.value, {
+        const formData = new FormData()
+        formData.append('name', form.value.name.trim())
+        formData.append('price', form.value.price)
+        formData.append('duration', form.value.duration)
+        formData.append('_method', 'PATCH')
+
+        if (form.value.photo instanceof File) {
+            formData.append('photo', form.value.photo);
+        }
+
+        router.post(`/admin/services/${props.service.id}`, formData, {
+            forceFormData: true,
             onSuccess: () => {
                 emit('updated')
                 closeModal()
@@ -239,11 +423,17 @@ const closeModal = () => {
     if (isSubmitting.value) return
 
     form.value = {
-        name: '',
-        price: null,
-        duration: null
+        name: props.service?.name || '',
+        price: props.service?.price || null,
+        duration: props.service?.duration || null,
+        photo: null,
+        _method: 'patch',
     }
     errors.value = {}
+    photoPreview.value = null
+    if (fileInput.value) {
+        fileInput.value.value = '';
+    }
 
     emit('close')
 }
@@ -265,5 +455,14 @@ const closeModal = () => {
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
     background: rgba(156, 163, 175, 0.7);
+}
+
+@keyframes dragPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+.border-blue-500.bg-blue-50 {
+    animation: dragPulse 1s ease-in-out infinite;
 }
 </style>

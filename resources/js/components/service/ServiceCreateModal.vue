@@ -106,6 +106,77 @@
                                 <p v-if="errors.duration" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ errors.duration }}</p>
                             </div>
 
+                            <div>
+                                <label for="photo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Service Photo
+                                </label>
+                                <div class="space-y-4">
+                                    <div
+                                        @drop="handleDrop"
+                                        @dragover.prevent
+                                        @dragenter.prevent="isDragging = true"
+                                        @dragleave="isDragging = false"
+                                        class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors duration-200"
+                                        :class="{ 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20': isDragging }"
+                                    >
+                                        <input
+                                            id="photo"
+                                            ref="fileInput"
+                                            type="file"
+                                            accept="image/*"
+                                            class="hidden"
+                                            @change="handleFileSelect"
+                                        />
+
+                                        <div v-if="!photoPreview" class="space-y-2">
+                                            <Upload class="w-8 h-8 text-gray-400 mx-auto" />
+                                            <div>
+                                                <button
+                                                    type="button"
+                                                    @click="$refs.fileInput.click()"
+                                                    class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                                                >
+                                                    Click to upload
+                                                </button>
+                                                <span class="text-gray-500 dark:text-gray-400"> or drag and drop</span>
+                                            </div>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, JPEG up to 2MB</p>
+                                        </div>
+
+                                        <div v-else class="space-y-3">
+                                            <div class="relative inline-block">
+                                                <img
+                                                    :src="photoPreview"
+                                                    alt="Service preview"
+                                                    class="w-32 h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    @click="removePhoto"
+                                                    class="absolute -top-2 -right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg transition-colors duration-200"
+                                                >
+                                                    <X class="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ form.photo?.name }}</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                    {{ formatFileSize(form.photo?.size) }}
+                                                </p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                @click="$refs.fileInput.click()"
+                                                class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
+                                            >
+                                                Change Photo
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p v-if="errors.photo" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ errors.photo }}</p>
+                            </div>
+
                             <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                                 <button
                                     type="button"
@@ -132,10 +203,10 @@
     </Transition>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue'
 import { router } from '@inertiajs/vue3'
-import { Scissors, Tag, Clock, X, Loader2 } from 'lucide-vue-next'
+import { Scissors, Tag, Clock, X, Loader2, Upload } from 'lucide-vue-next'
 import Swal from 'sweetalert2'
 
 const props = defineProps({
@@ -150,11 +221,82 @@ const emit = defineEmits(['close', 'created'])
 const form = ref({
     name: '',
     price: null,
-    duration: null
+    duration: null,
+    photo: null
 })
 
 const errors = ref({})
 const isSubmitting = ref(false)
+const isDragging = ref(false)
+const photoPreview = ref(null)
+const fileInput = ref(null)
+
+const handleFileSelect = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        validateAndSetFile(file)
+    }
+}
+
+const handleDrop = (event) => {
+    event.preventDefault()
+    isDragging.value = false
+
+    const files = event.dataTransfer.files
+    if (files.length > 0) {
+        validateAndSetFile(files[0])
+    }
+}
+
+const validateAndSetFile = (file) => {
+    if (!file.type.startsWith('image/')) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid File Type',
+            text: 'Please select an image file (PNG, JPG, JPEG)',
+            confirmButtonColor: '#3B82F6'
+        })
+        return
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+        Swal.fire({
+            icon: 'error',
+            title: 'File Too Large',
+            text: 'Please select an image smaller than 2MB',
+            confirmButtonColor: '#3B82F6'
+        })
+        return
+    }
+
+    form.value.photo = file
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+        photoPreview.value = e.target.result
+    }
+    reader.readAsDataURL(file)
+
+    if (errors.value.photo) {
+        delete errors.value.photo
+    }
+}
+
+const removePhoto = () => {
+    form.value.photo = null
+    photoPreview.value = null
+    if (fileInput.value) {
+        fileInput.value.value = '';
+    }
+}
+
+const formatFileSize = (bytes) => {
+    if (!bytes) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
 
 const submitForm = async () => {
     if (isSubmitting.value) return
@@ -179,7 +321,16 @@ const submitForm = async () => {
     isSubmitting.value = true
 
     try {
-        router.post('/admin/services', form.value, {
+        const formData = new FormData()
+        formData.append('name', form.value.name.trim())
+        formData.append('price', form.value.price)
+        formData.append('duration', form.value.duration)
+        if (form.value.photo) {
+            formData.append('photo', form.value.photo)
+        }
+
+        router.post('/admin/services', formData, {
+            forceFormData: true,
             onSuccess: () => {
                 resetForm()
                 emit('created')
@@ -217,9 +368,14 @@ const resetForm = () => {
     form.value = {
         name: '',
         price: null,
-        duration: null
+        duration: null,
+        photo: null
     }
     errors.value = {}
+    photoPreview.value = null
+    if (fileInput.value) {
+        fileInput.value.value = '';
+    }
 }
 
 const closeModal = () => {
@@ -254,5 +410,14 @@ watch(() => props.isOpen, (newValue) => {
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
     background: rgba(156, 163, 175, 0.7);
+}
+
+@keyframes dragPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+.border-blue-500.bg-blue-50 {
+    animation: dragPulse 1s ease-in-out infinite;
 }
 </style>

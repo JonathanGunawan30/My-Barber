@@ -148,6 +148,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Service Name</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Price</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Duration</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Photo</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                     </tr>
                     </thead>
@@ -178,6 +179,28 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                             {{ service.duration }} minutes
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div v-if="service.photo" class="flex items-center">
+                                <img
+                                    :src="`/storage/${service.photo}`"
+                                    :alt="service.name"
+                                    class="h-12 w-12 rounded-lg object-cover border border-gray-200 dark:border-gray-600 hover:scale-105 transition-transform duration-200 cursor-pointer"
+                                    @click="showImageModal(service)"
+                                />
+                                <button
+                                    @click="showImageModal(service)"
+                                    class="ml-2 p-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-all duration-200"
+                                >
+                                    <Eye class="w-4 h-4" />
+                                </button>
+                            </div>
+                            <div v-else class="flex items-center text-gray-500 dark:text-gray-400">
+                                <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                    <Image class="w-5 h-5" />
+                                </div>
+                                <span class="text-sm ml-2">No Image</span>
+                            </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div class="flex items-center space-x-2">
@@ -277,10 +300,52 @@
             @close="closeDetailModal"
             @edit="handleEditFromDetail"
         />
+
+        <Transition
+            enter-active-class="transition-opacity duration-300 ease-out"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+            leave-active-class="transition-opacity duration-200 ease-in"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+        >
+            <div
+                v-if="showImageFullscreenModal"
+                class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+                @click="closeImageFullscreenModal"
+            >
+                <Transition
+                    enter-active-class="transition-all duration-300 ease-out"
+                    enter-from-class="opacity-0 scale-90"
+                    enter-to-class="opacity-100 scale-100"
+                    leave-active-class="transition-all duration-200 ease-in"
+                    leave-from-class="opacity-100 scale-100"
+                    leave-to-class="opacity-0 scale-90"
+                >
+                    <div v-if="showImageFullscreenModal" class="relative max-w-4xl max-h-full">
+                        <img
+                            :src="`/storage/${selectedServiceForImageModal.photo}`"
+                            :alt="selectedServiceForImageModal.name"
+                            class="max-w-full max-h-full object-contain rounded-lg"
+                        />
+                        <button
+                            @click="closeImageFullscreenModal"
+                            class="absolute top-4 right-4 text-white hover:text-gray-300 bg-black bg-opacity-50 rounded-full p-2 transition-colors duration-200"
+                        >
+                            <X class="w-6 h-6" />
+                        </button>
+                        <div class="absolute bottom-4 left-4 bg-black bg-opacity-75 text-white p-3 rounded-lg">
+                            <h3 class="font-medium">{{ selectedServiceForImageModal.name }}</h3>
+                            <p class="text-sm text-gray-300">{{ formatRupiah(selectedServiceForImageModal.price) }} • {{ selectedServiceForImageModal.duration }} mins</p>
+                        </div>
+                    </div>
+                </Transition>
+            </div>
+        </Transition>
     </Layout>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import Layout from '@/layouts/AdminLayout.vue'
 import ServiceCreateModal from '@/components/service/ServiceCreateModal.vue'
@@ -288,7 +353,7 @@ import ServiceEditModal from '@/components/service/ServiceEditModal.vue'
 import ServiceDetailModal from '@/components/service/ServiceDetailModal.vue'
 import { router } from '@inertiajs/vue3'
 import {
-    Plus, Search, Scissors, Tag, Clock, Eye, Pencil, Trash, X,
+    Plus, Search, Scissors, Tag, Clock, Eye, Pencil, Trash, X, Image,
     ChevronLeft, ChevronRight, ChevronDown
 } from 'lucide-vue-next'
 import Swal from 'sweetalert2'
@@ -308,6 +373,9 @@ const showDetailModal = ref(false)
 const selectedServiceForDetail = ref(null)
 const currentPage = ref(1)
 const perPage = ref('10')
+
+const showImageFullscreenModal = ref(false)
+const selectedServiceForImageModal = ref(null)
 
 const filteredServices = computed(() => {
     let filtered = props.services
@@ -513,6 +581,16 @@ const confirmDelete = async (service) => {
         })
     }
 }
+
+const showImageModal = (service) => {
+    selectedServiceForImageModal.value = service;
+    showImageFullscreenModal.value = true;
+};
+
+const closeImageFullscreenModal = () => {
+    showImageFullscreenModal.value = false;
+    selectedServiceForImageModal.value = null;
+};
 
 watch([searchQuery, perPage], () => {
     currentPage.value = 1

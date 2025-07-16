@@ -12,10 +12,10 @@ class Service extends Model
     public $incrementing = true;
     public $timestamps = true;
 
-    protected $fillable = ['name', 'price', 'duration'];
+    protected $fillable = ['name', 'price', 'duration', 'photo'];
 
     public function bookings(): HasMany
     {
-        return $this->hasMany(Booking::class, 'service_id', 'id');;
+        return $this->hasMany(Booking::class, 'service_id', 'id');
     }
 }
