@@ -43,4 +43,9 @@ class Booking extends Model
     {
         return $this->hasOne(Payment::class, 'booking_id', 'id');
     }
+
+    public function testimonial(): HasOne
+    {
+        return $this->hasOne(Testimonial::class, 'booking_id', 'id');
+    }
 }

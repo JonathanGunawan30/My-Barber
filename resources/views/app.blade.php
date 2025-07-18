@@ -10,6 +10,7 @@
         <meta name="copyright" content="{{ config('app.name', 'Laravel') }}">
         <meta name="keywords" content="{{ config('app.name', 'Laravel') }}">
         <meta name="language" content="English">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>
@@ -25,6 +26,12 @@
                 }
             })();
         </script>
+
+        <script
+            type="text/javascript"
+            src="https://app.sandbox.midtrans.com/snap/snap.js"
+            data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"
+        ></script>
 
         {{-- Inline style to set the HTML background color based on our theme in app.css --}}
         <style>

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\OAuth\GoogleOAuthService;
+use App\Services\OAuth\OAuthService;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Support\ServiceProvider;
 
@@ -12,7 +14,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton( OAuthService::class, GoogleOAuthService::class);
     }
 
     /**

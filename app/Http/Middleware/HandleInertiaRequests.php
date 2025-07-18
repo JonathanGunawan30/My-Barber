@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
 
@@ -47,6 +48,13 @@ class HandleInertiaRequests extends Middleware
 
             'auth' => [
                 'user' => $request->user(),
+
+                'customer' => Auth::guard('customer')->user() ? [
+                    'id' => Auth::guard('customer')->user()->id,
+                    'name' => Auth::guard('customer')->user()->name,
+                    'email' => Auth::guard('customer')->user()->email,
+                    'avatar' => Auth::guard('customer')->user()->avatar,
+                ] : null,
             ],
 
             'ziggy' => [

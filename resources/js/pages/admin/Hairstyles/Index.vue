@@ -376,7 +376,7 @@
     </Layout>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import Layout from '@/layouts/AdminLayout.vue'
 import HairstyleCreateModal from '@/components/hairstyle/HairstyleCreateModal.vue'

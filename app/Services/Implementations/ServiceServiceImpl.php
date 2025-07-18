@@ -46,6 +46,7 @@ class ServiceServiceImpl implements ServiceService
             'price' => $request['price'] ?? $service->price,
             'duration' => $request['duration'] ?? $service->duration,
             'photo' => $request['photo'],
+            'description' => $request['description'] ?? $service->description,
         ]);
 
         return $service;

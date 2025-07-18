@@ -1,15 +1,29 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome');
-})->name('home');
+Route::get('/', [\App\Http\Controllers\Client\DashboardController::class, 'index'])->name('home');
+Route::get('/hairstyles', [\App\Http\Controllers\Client\DashboardController::class, 'hairstyles'])->name('hairstyles');
 
-Route::get('dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/auth/google/redirect', [\App\Http\Controllers\Auth\OAuthController::class, 'redirectToGoogle'])->name('google.redirect');
+Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\OAuthController::class, 'handleGoogleCallback'])->name('google.callback');
+Route::get('/auth/login', [\App\Http\Controllers\Auth\OAuthController::class, 'loginManually'])->name('login.customer');
+Route::post('/auth/login', [\App\Http\Controllers\Auth\OAuthController::class, 'loginManually'])->name('login.customer.post');
+Route::post('/auth/register', [\App\Http\Controllers\Auth\OAuthController::class, 'registerManually'])->name('register.customer');
+Route::post('/logout', [\App\Http\Controllers\Auth\OAuthController::class, 'logout'])->name('logout.customer');
+
+Route::middleware(['customer.auth'])->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Client\DashboardController::class, 'dashboard'])->name('customer.dashboard');
+
+    Route::get('/booking/create', [\App\Http\Controllers\BookingController::class, 'create'])->name('booking.create');
+    Route::post('/booking', [\App\Http\Controllers\BookingController::class, 'store'])->name('booking.store');
+    Route::post('/bookings/{booking}/testimonials', [\App\Http\Controllers\BookingController::class, 'review'])->name('reviews.store');
+
+});
+Route::post('/midtrans/callback', [App\Http\Controllers\BookingController::class, 'handleCallback']);
+Route::get('/booking/finish', [App\Http\Controllers\BookingController::class, 'finish'])->name('booking.finish');
+Route::post('/booking/update-status', [App\Http\Controllers\BookingController::class, 'updateStatus']);
+
 
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
@@ -35,7 +49,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::put('/profile', [\App\Http\Controllers\Admin\ProfileAdminController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [\App\Http\Controllers\Admin\ProfileAdminController::class, 'updatePassword'])->name('profile.password');
 
-    Route::get("/dashboard", [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+    Route::get("/dashboard", [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/bookings', [\App\Http\Controllers\Admin\BookingController::class, 'index'])->name('bookings.index');
+    Route::put('/bookings/{booking}/status', [\App\Http\Controllers\Admin\BookingController::class, 'updateStatus'])->name('bookings.updateStatus');
+    Route::delete('/bookings/{booking}', [\App\Http\Controllers\Admin\BookingController::class, 'destroy'])->name('bookings.destroy');
 
 });
 

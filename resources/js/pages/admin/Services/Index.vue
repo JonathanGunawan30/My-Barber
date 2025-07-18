@@ -146,6 +146,7 @@
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">#</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Service Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Description</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Price</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Duration</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Photo</th>
@@ -173,6 +174,9 @@
                                     <div class="text-sm text-gray-500 dark:text-gray-400">Service ID: {{ service.id }}</div>
                                 </div>
                             </div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-white max-w-xs overflow-hidden text-ellipsis whitespace-nowrap">
+                            {{ service.description || '-' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                             {{ formatRupiah(service.price) }}
@@ -378,11 +382,12 @@ const showImageFullscreenModal = ref(false)
 const selectedServiceForImageModal = ref(null)
 
 const filteredServices = computed(() => {
-    let filtered = props.services
+    let filtered = props.services as any[]
 
     if (searchQuery.value) {
         filtered = filtered.filter(service =>
-            service.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+            service.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+            service.description?.toLowerCase().includes(searchQuery.value.toLowerCase())
         )
     }
 
@@ -436,7 +441,7 @@ const visiblePages = computed(() => {
 })
 
 const averagePrice = computed(() => {
-    const validPrices = props.services
+    const validPrices = (props.services as any[])
         .map(service => Number(service.price))
         .filter(price => typeof price === 'number' && !isNaN(price));
 
@@ -448,7 +453,7 @@ const averagePrice = computed(() => {
 
 const averageDuration = computed(() => {
     if (props.services.length === 0) return 0
-    const total = props.services.reduce((sum, service) => sum + service.duration, 0)
+    const total = (props.services as any[]).reduce((sum, service) => sum + service.duration, 0)
     return Math.round(total / props.services.length)
 })
 

@@ -5,6 +5,7 @@ return [
     App\Providers\AuthServiceProvider::class,
     App\Providers\BarberServiceProvider::class,
     App\Providers\BranchServiceProvider::class,
+    App\Providers\ClientDashboardServiceProvider::class,
     App\Providers\CustomerServiceProvider::class,
     App\Providers\HairstyleServiceProvider::class,
     App\Providers\ProfileAdminServiceProvider::class,

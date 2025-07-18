@@ -85,6 +85,16 @@
                                             {{ service.duration }} minutes
                                         </p>
                                     </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                                            Description
+                                        </label>
+                                        <div class="bg-white dark:bg-gray-800 border rounded-lg p-3">
+                                            <p class="text-gray-900 dark:text-white leading-relaxed">
+                                                {{ service.description || 'No description provided.' }}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

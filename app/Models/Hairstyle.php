@@ -12,5 +12,4 @@ class Hairstyle extends Model
     public $timestamps = true;
     protected $fillable = ['name', 'photo', 'is_featured', 'description'];
 
-
 }

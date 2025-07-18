@@ -65,6 +65,24 @@
                             </div>
 
                             <div>
+                                <label for="edit-service-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Description (Optional)
+                                </label>
+                                <div class="relative">
+                                    <textarea
+                                        id="edit-service-description"
+                                        v-model="form.description"
+                                        rows="3"
+                                        placeholder="Briefly describe the service..."
+                                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-200 resize-y"
+                                        :class="{ 'border-red-500 focus:ring-red-500': errors.description }"
+                                    ></textarea>
+                                    <FileText class="absolute right-3 top-3 w-5 h-5 text-gray-400" />
+                                </div>
+                                <p v-if="errors.description" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ errors.description }}</p>
+                            </div>
+
+                            <div>
                                 <label for="edit-price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     Price (IDR) *
                                 </label>
@@ -230,7 +248,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { router } from '@inertiajs/vue3'
-import { Scissors, Tag, Clock, X, Loader2, Pencil, Save, Upload } from 'lucide-vue-next'
+import { Scissors, Tag, Clock, X, Loader2, Pencil, Save, Upload, FileText } from 'lucide-vue-next'
 import Swal from 'sweetalert2'
 
 const props = defineProps({
@@ -248,6 +266,7 @@ const emit = defineEmits(['close', 'updated'])
 
 const form = ref({
     name: '',
+    description: '',
     price: null,
     duration: null,
     photo: null,
@@ -264,6 +283,7 @@ watch(() => props.service, (newService) => {
     if (newService) {
         form.value = {
             name: newService.name || '',
+            description: newService.description || '',
             price: newService.price || null,
             duration: newService.duration || null,
             photo: null,
@@ -377,6 +397,7 @@ const submitForm = async () => {
     try {
         const formData = new FormData()
         formData.append('name', form.value.name.trim())
+        formData.append('description', form.value.description || '')
         formData.append('price', form.value.price)
         formData.append('duration', form.value.duration)
         formData.append('_method', 'PATCH')
@@ -424,6 +445,7 @@ const closeModal = () => {
 
     form.value = {
         name: props.service?.name || '',
+        description: props.service?.description || '',
         price: props.service?.price || null,
         duration: props.service?.duration || null,
         photo: null,

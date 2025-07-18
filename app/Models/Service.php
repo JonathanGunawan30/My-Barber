@@ -12,7 +12,7 @@ class Service extends Model
     public $incrementing = true;
     public $timestamps = true;
 
-    protected $fillable = ['name', 'price', 'duration', 'photo'];
+    protected $fillable = ['name', 'price', 'duration', 'photo', 'description'];
 
     public function bookings(): HasMany
     {

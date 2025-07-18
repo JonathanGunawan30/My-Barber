@@ -14,7 +14,7 @@ class Testimonial extends Model
 
     protected $fillable = [
         'customer_id', 'barber_id',
-        'rating', 'comment'
+        'rating', 'comment', 'booking_id'
     ];
 
     public function customer(): BelongsTo
@@ -25,5 +25,10 @@ class Testimonial extends Model
     public function barber()
     {
         return $this->belongsTo(Barber::class, 'barber_id', 'id');
+    }
+
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class, 'booking_id', 'id');
     }
 }
